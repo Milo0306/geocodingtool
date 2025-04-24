@@ -31,12 +31,12 @@ class GeocodingApp(QWidget):
         self.ulice = []
 
     def initUI(self):
-        self.setWindowTitle("📍 Geocoding CSV")
+        self.setWindowTitle("Geocoding CSV")
         self.setGeometry(100, 100, 900, 700)
         layout = QVBoxLayout()
         font = QFont("Arial", 12)
 
-        self.select_file_btn = QPushButton("📂 Wybierz plik CSV", self)
+        self.select_file_btn = QPushButton("Wybierz plik CSV", self)
         self.select_file_btn.setFont(font)
         self.select_file_btn.clicked.connect(self.select_file)
         layout.addWidget(self.select_file_btn)
@@ -62,12 +62,12 @@ class GeocodingApp(QWidget):
         self.table_widget.setFont(font)
         layout.addWidget(self.table_widget)
 
-        self.clean_btn = QPushButton("✅ Zatwierdź", self)
+        self.clean_btn = QPushButton("Zatwierdź", self)
         self.clean_btn.setFont(font)
         self.clean_btn.clicked.connect(self.clean_inputs)
         layout.addWidget(self.clean_btn)
 
-        self.start_btn = QPushButton("🚀 Rozpocznij Geocoding", self)
+        self.start_btn = QPushButton("Rozpocznij Geocoding", self)
         self.start_btn.setFont(font)
         self.start_btn.clicked.connect(self.process_geocoding)
         layout.addWidget(self.start_btn)
@@ -92,7 +92,7 @@ class GeocodingApp(QWidget):
         file_path, _ = file_dialog.getOpenFileName(self, "Wybierz plik CSV", "", "CSV files (*.csv)")
         if file_path:
             self.file_path = file_path
-            self.log(f"✅ Wybrano plik: {file_path}")
+            self.log(f"Wybrano plik: {file_path}")
             self.load_streets()
 
     def detect_encoding(self, file_path):
@@ -103,16 +103,16 @@ class GeocodingApp(QWidget):
 
     def load_streets(self):
         encoding = self.detect_encoding(self.file_path)
-        self.log(f"🔍 Wykryte kodowanie: {encoding}, konwersja do utf-8-sig")
+        self.log(f"Wykryte kodowanie: {encoding}, konwersja do utf-8-sig")
         try:
             df = pd.read_csv(self.file_path, encoding=encoding, sep=';')
             df.to_csv(self.file_path, encoding='utf-8-sig', index=False, sep=';')
             self.df = df
             self.ulice = df["STREET"].astype(str) + " " + df["street_number"].astype(str)
             self.display_data(df)
-            self.log(f"✅ Załadowano {len(self.ulice)} ulic.")
+            self.log(f"Załadowano {len(self.ulice)} ulic.")
         except Exception as e:
-            self.log(f"❌ Błąd odczytu pliku: {e}")
+            self.log(f"Błąd odczytu pliku: {e}")
 
     def display_data(self, df):
         self.table_widget.setRowCount(df.shape[0])
@@ -127,7 +127,7 @@ class GeocodingApp(QWidget):
         self.miasto = ' '.join(self.miasto_input.text().split())
         self.powiat_input.setText(self.powiat)
         self.miasto_input.setText(self.miasto)
-        self.log("✅ Dane zatwierdzone i oczyszczone z nadmiarowych spacji.")
+        self.log("Dane zatwierdzone i oczyszczone z nadmiarowych spacji.")
 
     def get_coordinates(self, street, street_number, wojewodztwo, miasto, powiat):
         address = f"{street} {street_number}, {miasto}, {powiat}, {wojewodztwo}"
@@ -145,14 +145,14 @@ class GeocodingApp(QWidget):
                 return loc['lat'], loc['lng'], powiat_z_api
             return "Nie znaleziono", "Nie znaleziono", "Nie znaleziono"
         except requests.exceptions.RequestException as e:
-            self.log(f"⚠️ Błąd sieci: {address} → {e}")
+            self.log(f"Błąd sieci: {address} → {e}")
             return "Nie znaleziono", "Nie znaleziono", "Nie znaleziono"
 
     def process_geocoding(self):
         if not self.file_path:
-            self.log("❌ Brak pliku CSV.")
+            self.log("Brak pliku CSV.")
             return
-        self.log("⏳ Geokodowanie w toku...")
+        self.log("Geokodowanie w toku...")
         self.progress_bar.setValue(0)
         geocoded_data = []
         total_rows = len(self.df)
@@ -178,7 +178,7 @@ class GeocodingApp(QWidget):
                 self.progress_bar.setValue(int((processed_rows / total_rows) * 100))
         self.save_geocoded_data(geocoded_data)
         self.progress_bar.setValue(100)
-        self.log("✅ Geokodowanie zakończone.")
+        self.log("Geokodowanie zakończone.")
 
     def save_geocoded_data(self, geocoded_data):
         output_file = self.file_path.replace(".csv", "_geocoded.xlsx")
@@ -188,9 +188,9 @@ class GeocodingApp(QWidget):
         )
         try:
             df.to_excel(output_file, index=False, engine='openpyxl')
-            self.log(f"✅ Zapisano geokodowane dane do pliku: {output_file}")
+            self.log(f"Zapisano geokodowane dane do pliku: {output_file}")
         except Exception as e:
-            self.log(f"❌ Błąd zapisu pliku: {e}")
+            self.log(f"Błąd zapisu pliku: {e}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
